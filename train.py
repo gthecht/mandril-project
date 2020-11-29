@@ -61,6 +61,7 @@ def main(args):
     num_iterations = 0
     for batch in trange(config['num-batches']):
         tasks = sampler.sample_tasks(num_tasks=config['meta-batch-size'])
+        # >> need to change the futures to use an expert's demos
         futures = sampler.sample_async(tasks,
                                        num_steps=config['num-steps'],
                                        fast_lr=config['fast-lr'],

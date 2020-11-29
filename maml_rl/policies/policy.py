@@ -18,6 +18,8 @@ class Policy(nn.Module):
         self.named_meta_parameters = self.named_parameters
         self.meta_parameters = self.parameters
 
+    # >> here we update the parameters. I need to create phi, instead of theta, 
+    # but there's not much difference
     def update_params(self, loss, params=None, step_size=0.5, first_order=False):
         """Apply one step of gradient descent on the loss function `loss`, with 
         step-size `step_size`, and returns the updated parameters of the neural 

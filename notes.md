@@ -82,7 +82,7 @@ The metalearner.step (I presume where we do the step is the update to $\theta$)
     * **Return** $\frac{\partial L} {\partial r_\theta}$
 * **end function**
 ### The code
-We have to change a few things:
+#### We have to change a few things:
 1. Sample the demos instead of the trajectories:
     * We need to get the trajectories according to the demos instead of the reward function.
 2. Get the inner loss using the max-entropy algorithm (for which we need to write the max-ent function)
@@ -91,3 +91,8 @@ We have to change a few things:
     * Once mroe use the max-ent function and from there to get the loss, and thence the gradient.
 
 In addition we need to write the max-ent function.
+
+#### Code to change:
+1. In ***/policy.py:*** *def update_params*, change the parameters update from theta to phi.
+2. In ***/multi_task_sampler.py:*** *def sample_trajectories*, we'll need to sample the demos from the expert instead of the trajectories of the model.
+3. In ***/multi_task_sampler.py:*** *def self.policy_lock*, we;kk need to calculate the meta-training loss with the max-ent function, from the demos.

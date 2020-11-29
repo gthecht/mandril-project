@@ -111,9 +111,11 @@ class MultiTaskSampler(Sampler):
         self._train_consumer_thread = None
         self._valid_consumer_thread = None
 
+    # >> get a number of tasks from the environment
     def sample_tasks(self, num_tasks):
         return self.env.unwrapped.sample_tasks(num_tasks)
 
+    # >> Run all the tasks in an async manner
     def sample_async(self, tasks, **kwargs):
         if self._waiting_sample:
             raise RuntimeError('Calling `sample_async` while waiting '
@@ -121,10 +123,12 @@ class MultiTaskSampler(Sampler):
                                'to complete. Please call `sample_wait` '
                                'before calling `sample_async` again.')
 
+        # >> add the task to the queue
         for index, task in enumerate(tasks):
             self.task_queue.put((index, task, kwargs))
 
         num_steps = kwargs.get('num_steps', 1)
+        # >> get the futures for all tasks
         futures = self._start_consumer_threads(tasks,
                                                num_steps=num_steps)
         self._waiting_sample = True
@@ -255,6 +259,7 @@ class SamplerWorker(mp.Process):
         # applied since this is only used for sampling trajectories, and not
         # for optimization.
         params = None
+        # >> Here we train on one meta-training example:
         for step in range(num_steps):
             train_episodes = self.create_episodes(params=params,
                                                   gamma=gamma,
@@ -262,12 +267,14 @@ class SamplerWorker(mp.Process):
                                                   device=device)
             train_episodes.log('_enqueueAt', datetime.now(timezone.utc))
             # QKFIX: Deep copy the episodes before sending them to their
-            # respective queues, to avoid a race condition. This issue would 
+            # respective queues, to avoid a race condition. This issue would
             # cause the policy pi = policy(observations) to be miscomputed for
             # some timesteps, which in turns makes the loss explode.
             self.train_queue.put((index, step, deepcopy(train_episodes)))
 
             with self.policy_lock:
+                # >> here we calculate the meta-training loss - I'll need to use
+                # the examples with max-ent function instead
                 loss = reinforce_loss(self.policy, train_episodes, params=params)
                 params = self.policy.update_params(loss,
                                                    params=params,
@@ -304,6 +311,7 @@ class SamplerWorker(mp.Process):
                                     normalize=True)
         return episodes
 
+    # >> Here we'll need to sample demos instead.
     def sample_trajectories(self, params=None):
         observations = self.envs.reset()
         with torch.no_grad():
