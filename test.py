@@ -14,6 +14,7 @@ from maml_rl.utils.reinforcement_learning import get_returns
 def main(args):
     with open(args.config, 'r') as f:
         config = json.load(f)
+        if 'env-kwargs' not in config.keys(): config['env-kwargs'] = {}
 
     if args.seed is not None:
         torch.manual_seed(args.seed)
