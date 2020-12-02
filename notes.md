@@ -95,4 +95,37 @@ In addition we need to write the max-ent function.
 #### Code to change:
 1. In ***/policy.py:*** *def update_params*, change the parameters update from theta to phi.
 2. In ***/multi_task_sampler.py:*** *def sample_trajectories*, we'll need to sample the demos from the expert instead of the trajectories of the model.
-3. In ***/multi_task_sampler.py:*** *def self.policy_lock*, we;kk need to calculate the meta-training loss with the max-ent function, from the demos.
+   Maybe here, instead of taking the actions from pi.sample, I can just take the demo's actions
+3. In ***/multi_task_sampler.py:*** *def self.policy_lock*, we'll need to calculate the meta-training loss with the max-ent function, from the demos.
+4. In ***/reinforcement_learning.py:*** *def reinforce_loss*, I'll need to change so that it uses max-ent (and implement that in a separate file)
+
+#### 4.
+the code:
+```python
+def reinforce_loss(policy, episodes, params=None):
+    # I assume that pi the trajectory chosen by the policy. We need to change
+    # this to the demos
+    pi = policy(episodes.observations.view((-1, *episodes.observation_shape)),
+                params=params)
+
+    log_probs = pi.log_prob(episodes.actions.view((-1, *episodes.action_shape)))
+    log_probs = log_probs.view(len(episodes), episodes.batch_size)
+
+    losses = -weighted_mean(log_probs * episodes.advantages,
+                            lengths=episodes.lengths)
+    # I may want to return the dL/dr instead of L, since then we simply
+    # differentiate by theta
+    return losses.mean()
+```
+* **policy** is currently the CategoricalMLPPolicy, Which I assume has something to do with the MAB problem on which I'm trying it out.
+* **episodes** are the maml_rl batch episodes, currently with 10 examples.
+* **pi** is after running the policy, I cant see anything interesting there.
+* **log_probs** looks like the log of the probabilities - which is exactly what we need.
+What I should do is instead of calling this function, create a function for Mandril, that returns $\frac{\partial L_{T_i}}{\partial r_\theta}$
+
+## TO DO
+* I need to implement the max-ent: *Use $\frac{\partial L} {\partial r_\theta}=E_T [\mu_T]-\mu_D$ like in the max-ent function.* These are the state visitations trajecotries, and I can get them from Ziebart.
+* Where to change the validation point for the meta testing.
+* Build a framework for which I have demos, and can test mandril.
+* Change how the loss is calculated (with max-ent of course)
+* Change how the test step is done.
