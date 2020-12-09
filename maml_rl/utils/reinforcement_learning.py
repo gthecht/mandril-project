@@ -26,7 +26,10 @@ def value_iteration_finite_horizon(transitions, rewards, horizon=10, gamma=0.95)
 def get_returns(episodes):
     return to_numpy([episode.rewards.sum(dim=0) for episode in episodes])
 
+# Here I can change the loss to use max-ent. Remember that I need dL/dr.
 def reinforce_loss(policy, episodes, params=None):
+    # I assume that pi the trajectory chosen by the policy. We need to change
+    # this to the demos
     pi = policy(episodes.observations.view((-1, *episodes.observation_shape)),
                 params=params)
 
@@ -35,5 +38,6 @@ def reinforce_loss(policy, episodes, params=None):
 
     losses = -weighted_mean(log_probs * episodes.advantages,
                             lengths=episodes.lengths)
-
+    # I may want to return the dL/dr instead of L, since then we simply
+    # differentiate by theta
     return losses.mean()

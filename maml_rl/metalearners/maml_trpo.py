@@ -62,6 +62,7 @@ class MAMLTRPO(GradientBasedMetaLearner):
         # Loop over the number of steps of adaptation
         params = None
         for futures in train_futures:
+            # This is where we use the reinforce_loss
             inner_loss = reinforce_loss(self.policy,
                                         await futures,
                                         params=params)

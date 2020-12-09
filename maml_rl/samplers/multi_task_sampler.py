@@ -275,7 +275,11 @@ class SamplerWorker(mp.Process):
             with self.policy_lock:
                 # >> here we calculate the meta-training loss - I'll need to use
                 # the examples with max-ent function instead
+                # here instead of loss, we should get dL/dr, and then update the
+                # params!
                 loss = reinforce_loss(self.policy, train_episodes, params=params)
+                # don't forget to check how the update works - and if it needs
+                # changing.
                 params = self.policy.update_params(loss,
                                                    params=params,
                                                    step_size=fast_lr,
