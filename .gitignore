@@ -134,3 +134,6 @@ dmypy.json
 # maml code:
 maml-*/*
 data/*
+
+*.gif
+*.mp4
