@@ -8,3 +8,6 @@ from .motion import MooreMotion
 from .maze import BaseMaze
 
 from .env import BaseEnv
+
+from .gym.maze import Maze
+from .gym.mazeEnv import MazeEnv
