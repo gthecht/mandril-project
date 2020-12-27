@@ -1,0 +1,34 @@
+{
+  "env-name": "RandomShapeMaze-v0",
+  "env-kwargs": {
+    "width": 50,
+    "height": 50,
+    "max_shapes": 50,
+    "max_size": 8,
+    "allow_overlap": false,
+    "shape": null
+  },
+  "gamma": 0.99,
+  "gae-lambda": 1.0,
+  "first-order": false,
+  "hidden-sizes": [
+    64,
+    64
+  ],
+  "nonlinearity": "tanh",
+  "fast-batch-size": 20,
+  "num-steps": 1,
+  "fast-lr": 0.1,
+  "num-batches": 100,
+  "meta-batch-size": 20,
+  "max-kl": 0.01,
+  "cg-iters": 10,
+  "cg-damping": 1e-05,
+  "ls-max-steps": 15,
+  "ls-backtrack-ratio": 0.8,
+  "config": "./runMaze/randomShapeMaze.yaml",
+  "output_folder": "maml-randomShapeMaze",
+  "seed": null,
+  "num_workers": 8,
+  "device": "cpu"
+}
