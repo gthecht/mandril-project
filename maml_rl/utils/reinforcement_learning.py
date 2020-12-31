@@ -1,6 +1,7 @@
 import numpy as np
 
 from maml_rl.utils.torch_utils import weighted_mean, to_numpy
+from mandril.maxent import MaxEnt
 
 def value_iteration(transitions, rewards, gamma=0.95, theta=1e-5):
     rewards = np.expand_dims(rewards, axis=2)
@@ -28,6 +29,12 @@ def get_returns(episodes):
 
 # Here I can change the loss to use max-ent. Remember that I need dL/dr.
 def reinforce_loss(policy, episodes, params=None):
+    max_ent = MaxEnt()
+    losses = max_ent.calc(policy, episodes, params)
+    return losses
+
+
+def old_reinforce_loss(policy, episodes, params=None):
     # I assume that pi the trajectory chosen by the policy. We need to change
     # this to the demos
     pi = policy(episodes.observations.view((-1, *episodes.observation_shape)),
