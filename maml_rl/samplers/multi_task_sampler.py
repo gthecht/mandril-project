@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 import torch.multiprocessing as mp
 import asyncio
@@ -317,6 +318,41 @@ class SamplerWorker(mp.Process):
 
     # >> Here we'll need to sample demos instead.
     def sample_trajectories(self, params=None):
+        observations = self.envs.reset()
+        with torch.no_grad():
+            for i, env in enumerate(self.envs.envs):
+                img = env.render('rgb_array')
+                plt.imsave("./images/img{0}.png".format(i), img)
+
+
+            from mazelab.solvers import dijkstra_solver
+            actions_list = []
+
+            for env in self.envs.envs:
+                impassable_array = env.unwrapped.maze.to_impassable()
+                motions = env.unwrapped.motions
+                start = env.unwrapped.maze.objects.agent.positions[0]
+                goal = env.unwrapped.maze.objects.goal.positions[0]
+
+                actions = dijkstra_solver(impassable_array, motions, start, goal)
+                actions_list.append(actions)
+
+            max_length = max(map(len, actions_list))
+            actions_list = [actions + [None] * (max_length - len(actions)) \
+                            for actions in actions_list]
+            actions_mat = np.array(actions_list).T
+            
+            # observations = self.envs.reset()
+            while not self.envs.dones.all():
+                actions = actions_mat[0,:]
+                actions = actions[actions != None]
+                actions_mat = actions_mat[1:,:] # remove current action from actions matrix
+                new_observations, rewards, _, infos = self.envs.step(actions)
+                batch_ids = infos['batch_ids']
+                yield (observations, actions.astype(np.float32), rewards, batch_ids)
+                observations = new_observations
+
+    def maml_sample_trajectories(self, params=None):
         observations = self.envs.reset()
         with torch.no_grad():
             while not self.envs.dones.all():
