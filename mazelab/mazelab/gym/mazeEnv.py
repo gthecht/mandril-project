@@ -6,6 +6,8 @@ from mazelab import VonNeumannMotion
 from mazelab import Maze
 from mazelab.generators import random_shape_maze
 
+from mazelab.solvers import dijkstra_solver
+
 maze_gen = random_shape_maze
 
 import gym
@@ -22,17 +24,9 @@ class MazeEnv(BaseEnv):
         self.max_size = max_size
         self.allow_overlap = allow_overlap
         self.shape = shape
-
-        self.x = self.sample_tasks(1)[0]
-
-        empty = np.where(self.x == 0)
-        inds = np.random.choice(len(empty[0]), 2, replace=False)
-
-        self.start_idx = [[empty[0][inds[0]], empty[1][inds[0]]]]
-        self.goal_idx = [[empty[0][inds[1]], empty[1][inds[1]]]]
-
-        self.maze = Maze(self.x)
         self.motions = VonNeumannMotion()
+
+        self.reset_task()
 
         # We need the observation space to be square, currently it was just one long vector.
         shape = (self.width * self.height,)
@@ -70,21 +64,34 @@ class MazeEnv(BaseEnv):
 
     # reset the specific task - with the same start and finish
     def reset(self):
-        self.maze.objects.agent.positions = self.start_idx
-        self.maze.objects.goal.positions = self.goal_idx
+        empty = np.where(self.x == 0)
+        while True:
+            inds = np.random.choice(len(empty[0]), 2, replace=False)
+
+            self.start_idx = [[ empty[0][inds[0]], empty[1][inds[0]] ]]
+            self.goal_idx  = [[ empty[0][inds[1]], empty[1][inds[1]] ]]
+
+            self.maze = Maze(self.x)
+            self.maze.objects.agent.positions = self.start_idx
+            self.maze.objects.goal.positions = self.goal_idx
+            if self.is_solvable(): break
+        # self.maze.objects.agent.positions = self.start_idx
+        # self.maze.objects.goal.positions = self.goal_idx
         return self.maze.to_value()
 
     # reset the task with different start and goal:
-    def reset_task(self, task):
-        empty = np.where(task == 0)
-        inds = np.random.choice(len(empty[0]), 2, replace=False)
+    def reset_task(self, task=None):
+        self.x = self.sample_tasks(1)[0]
+        return self.reset()
 
-        self.start_idx = [[empty[0][inds[0]], empty[1][inds[0]]]]
-        self.goal_idx = [[empty[0][inds[1]], empty[1][inds[1]]]]
-
-        self.maze.objects.agent.positions = self.start_idx
-        self.maze.objects.goal.positions = self.goal_idx
-        return self.maze.to_value()
+    def is_solvable(self):
+        actions = dijkstra_solver(
+            self.maze.to_impassable(),
+            self.motions,
+            self.start_idx[0],
+            self.goal_idx[0]
+        )
+        return actions != None
 
     def _is_valid(self, position):
         nonnegative = position[0] >= 0 and position[1] >= 0
@@ -102,3 +109,4 @@ class MazeEnv(BaseEnv):
 
     def get_image(self):
         return self.maze.to_rgb()
+
