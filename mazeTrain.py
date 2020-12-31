@@ -115,6 +115,7 @@ if __name__ == '__main__':
         'Model-Agnostic Meta-Learning (MAML) - Train')
 
     # args for running on mazelab
+    args = parser.parse_args()
     args.config = "./runMaze/randomShapeMaze.yaml"
     args.output_folder = "maml-randomShapeMaze"
     args.seed = None
