@@ -5,6 +5,7 @@ import asyncio
 import threading
 import time
 
+import matplotlib.pyplot as plt
 from datetime import datetime, timezone
 from copy import deepcopy
 
