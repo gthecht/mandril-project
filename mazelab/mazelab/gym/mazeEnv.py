@@ -26,7 +26,7 @@ class MazeEnv(BaseEnv):
         self.shape = shape
         self.motions = VonNeumannMotion()
 
-        self.reset_task(self.sample_tasks(1)[0])
+        self.reset_task()
 
         # We need the observation space to be square, currently it was just one long vector.
         shape = (self.width * self.height,)
@@ -64,13 +64,6 @@ class MazeEnv(BaseEnv):
 
     # reset the specific task - with the same start and finish
     def reset(self):
-        self.maze.objects.agent.positions = self.start_idx
-        self.maze.objects.goal.positions = self.goal_idx
-        return self.maze.to_value()
-
-    # reset the task with different start and goal:
-    def reset_task(self, task):
-        self.x = task
         empty = np.where(self.x == 0)
         while True:
             inds = np.random.choice(len(empty[0]), 2, replace=False)
@@ -82,6 +75,13 @@ class MazeEnv(BaseEnv):
             self.maze.objects.agent.positions = self.start_idx
             self.maze.objects.goal.positions = self.goal_idx
             if self.is_solvable(): break
+        # self.maze.objects.agent.positions = self.start_idx
+        # self.maze.objects.goal.positions = self.goal_idx
+        return self.maze.to_value()
+
+    # reset the task with different start and goal:
+    def reset_task(self, task=None):
+        self.x = self.sample_tasks(1)[0]
         return self.reset()
 
     def is_solvable(self):
