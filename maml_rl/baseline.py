@@ -4,6 +4,9 @@ import torch.nn.functional as F
 
 from collections import OrderedDict
 
+from functools import reduce
+from operator import mul
+
 class LinearFeatureBaseline(nn.Module):
     """Linear baseline based on handcrafted features, as described in [1] 
     (Supplementary Material 2).
@@ -26,11 +29,12 @@ class LinearFeatureBaseline(nn.Module):
 
     @property
     def feature_size(self):
-        return 2 * self.input_size + 4
+        return 2 * reduce(mul, self.input_size, 1) + 4
+        # return 2 * self.input_size + 4
 
     def _feature(self, episodes):
         ones = episodes.mask.unsqueeze(2)
-        observations = episodes.observations
+        observations = episodes.observations.reshape(ones.shape + (-1,)).squeeze()
         time_step = torch.arange(len(episodes)).view(-1, 1, 1) * ones / 100.0
 
         return torch.cat([

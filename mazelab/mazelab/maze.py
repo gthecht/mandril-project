@@ -41,7 +41,7 @@ class BaseMaze(ABC):
 
     def to_value(self):
         x = np.empty(self.size, dtype=np.uint8)
-        return flatten(self._convert(x, 'value'))
+        return self._convert(x, 'value')
 
     def to_rgb(self):
         x = np.empty((*self.size, 3), dtype=np.uint8)

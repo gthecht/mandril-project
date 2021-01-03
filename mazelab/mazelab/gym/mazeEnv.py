@@ -29,7 +29,7 @@ class MazeEnv(BaseEnv):
         self.reset_task()
 
         # We need the observation space to be square, currently it was just one long vector.
-        shape = (self.width * self.height,)
+        shape = (self.height, self.width)
         # shape = self.maze.size
         self.observation_space = Box(low=0, high=len(self.maze.objects), shape=shape, dtype=np.float32)
         self.action_space = Discrete(len(self.motions))

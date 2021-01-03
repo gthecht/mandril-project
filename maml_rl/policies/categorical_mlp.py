@@ -23,26 +23,39 @@ class CategoricalMLPPolicy(Policy):
         self.nonlinearity = nonlinearity
         self.num_layers = len(hidden_sizes) + 1
 
-        layer_sizes = (input_size,) + hidden_sizes + (output_size,)
-        for i in range(1, self.num_layers + 1):
+        layer_sizes = (1,) + hidden_sizes + (output_size,)
+        for i in range(1, self.num_layers):
             self.add_module('layer{0}'.format(i),
-                            nn.Linear(layer_sizes[i - 1], layer_sizes[i]))
-
+                            nn.Conv2d(layer_sizes[i - 1], layer_sizes[i], 3))
+        self.add_module('layer{0}'.format(self.num_layers),
+                        nn.Linear(
+                            layer_sizes[-2] *
+                            (input_size[0] - 2 * len(hidden_sizes)) *
+                            (input_size[1] - 2 * len(hidden_sizes)),
+                            layer_sizes[-1]))
+        
         self.apply(weight_init)
 
     def forward(self, input, params=None):
         if params is None:
             params = OrderedDict(self.named_parameters())
 
-        output = input
+        input_shape = input.shape
+        if input.dim() == 3:
+            output = input[:,None,:,:]
+        else:
+            output = input.reshape(-1,1, input_shape[2], input_shape[3])
+        
         for i in range(1, self.num_layers):
-            output = F.linear(output,
+            output = F.conv2d(output,
                               weight=params['layer{0}.weight'.format(i)],
                               bias=params['layer{0}.bias'.format(i)])
             output = self.nonlinearity(output)
 
-        logits = F.linear(output,
+        logits = F.linear(output.flatten(1),
                           weight=params['layer{0}.weight'.format(self.num_layers)],
                           bias=params['layer{0}.bias'.format(self.num_layers)])
 
+        if input.dim() == 4:
+            logits = logits.reshape(input_shape[0], input_shape[1], -1)
         return Categorical(logits=logits)
