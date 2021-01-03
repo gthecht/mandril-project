@@ -5,10 +5,10 @@ env-name: "RandomShapeMaze-v0"
 
 # Additional parameters for the environment (eg. bound for task sampling).
 env-kwargs:
-  width: 50
-  height: 50
-  max_shapes: 50
-  max_size: 8
+  width: 20
+  height: 20
+  max_shapes: 20
+  max_size: 4
   allow_overlap: false
   shape: null
 
@@ -24,10 +24,10 @@ first-order: false
 # Policy network
 # --------------
 # Number of hidden units in each layer.
-hidden-sizes: [64, 64]
+hidden-sizes: [32, 32]
 
 # Non-linear activation function to apply after each hidden layer.
-nonlinearity: "tanh"
+nonlinearity: "relu"
 
 # Task-specific
 # -------------
@@ -43,7 +43,7 @@ fast-lr: 0.1
 # Optimization
 # ------------
 # Number of outer-loop updates (ie. number of batches of tasks).
-num-batches: 100
+num-batches: 5000
 
 # Number of tasks in each batch of tasks.
 meta-batch-size: 20
