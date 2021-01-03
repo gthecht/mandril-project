@@ -264,7 +264,8 @@ class SamplerWorker(mp.Process):
             train_episodes = self.create_episodes(params=params,
                                                   gamma=gamma,
                                                   gae_lambda=gae_lambda,
-                                                  device=device)
+                                                  device=device,
+                                                  validation_flag=False)
             train_episodes.log('_enqueueAt', datetime.now(timezone.utc))
             # QKFIX: Deep copy the episodes before sending them to their
             # respective queues, to avoid a race condition. This issue would
@@ -289,7 +290,8 @@ class SamplerWorker(mp.Process):
         valid_episodes = self.create_episodes(params=params,
                                               gamma=gamma,
                                               gae_lambda=gae_lambda,
-                                              device=device)
+                                              device=device,
+                                              validation_flag=True)
         valid_episodes.log('_enqueueAt', datetime.now(timezone.utc))
         self.valid_queue.put((index, None, deepcopy(valid_episodes)))
 
@@ -297,7 +299,8 @@ class SamplerWorker(mp.Process):
                         params=None,
                         gamma=0.95,
                         gae_lambda=1.0,
-                        device='cpu'):
+                        device='cpu',
+                        validation_flag=False):
         episodes = BatchEpisodes(batch_size=self.batch_size,
                                  gamma=gamma,
                                  device=device)
@@ -305,6 +308,10 @@ class SamplerWorker(mp.Process):
         episodes.log('process_name', self.name)
 
         t0 = time.time()
+        if validation_flag:
+            for item in self.maml_sample_trajectories(params=params):
+                episodes.append(*item)
+
         for item in self.sample_trajectories(params=params):
             episodes.append(*item)
         episodes.log('duration', time.time() - t0)
