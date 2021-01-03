@@ -74,11 +74,11 @@ def main(args):
         train_returns.append(get_returns(train_episodes[0]))
         valid_returns.append(get_returns(valid_episodes))
 
-    logs['train_returns'] = np.concatenate(train_returns, axis=0)
-    logs['valid_returns'] = np.concatenate(valid_returns, axis=0)
+        logs['train_returns'] = np.concatenate(train_returns, axis=0)
+        logs['valid_returns'] = np.concatenate(valid_returns, axis=0)
 
-    with open(args.output, 'wb') as f:
-        np.savez(f, **logs)
+        with open(args.output, 'wb') as f:
+            np.savez(f, **logs)
 
 
 if __name__ == '__main__':
