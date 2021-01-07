@@ -24,7 +24,7 @@ class CategoricalMLPPolicy(Policy):
         self.nonlinearity = nonlinearity
         self.num_layers = len(hidden_sizes) + 1
 
-        layer_sizes = (1,) + hidden_sizes + (output_size,)
+        layer_sizes = (4,) + hidden_sizes + (output_size,)
         fc_input = np.array(input_size)
         for i in range(1, self.num_layers):
             self.add_module('layer{0}'.format(i),
@@ -47,7 +47,11 @@ class CategoricalMLPPolicy(Policy):
             output = input[:,None,:,:]
         else:
             output = input.reshape(-1,1, input_shape[2], input_shape[3])
-        
+
+        # extract layers from image-matrix
+        output = torch.cat([torch.where(output == val, 1.0, 0.0)
+                            for val in range(4)], dim=1)
+
         for i in range(1, self.num_layers):
             output = F.conv2d(output,
                               weight=params['layer{0}.weight'.format(i)],
