@@ -19,12 +19,14 @@ class Sampler(object):
                  batch_size,
                  policy,
                  seed=None,
+                 alg=None,
                  env=None):
         self.env_name = env_name
         self.env_kwargs = env_kwargs
         self.batch_size = batch_size
         self.policy = policy
         self.seed = seed
+        self.alg = alg
 
         if env is None:
             env = gym.make(env_name, **env_kwargs)

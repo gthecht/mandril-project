@@ -73,12 +73,14 @@ class MultiTaskSampler(Sampler):
                  baseline,
                  env=None,
                  seed=None,
+                 alg="maml",
                  num_workers=1):
         super(MultiTaskSampler, self).__init__(env_name,
                                                env_kwargs,
                                                batch_size,
                                                policy,
                                                seed=seed,
+                                               alg=alg,
                                                env=env)
 
         self.num_workers = num_workers
@@ -97,6 +99,7 @@ class MultiTaskSampler(Sampler):
                                       self.policy,
                                       deepcopy(baseline),
                                       self.seed,
+                                      self.alg,
                                       self.task_queue,
                                       self.train_episodes_queue,
                                       self.valid_episodes_queue,
@@ -225,6 +228,7 @@ class SamplerWorker(mp.Process):
                  policy,
                  baseline,
                  seed,
+                 alg,
                  task_queue,
                  train_queue,
                  valid_queue,
@@ -237,6 +241,7 @@ class SamplerWorker(mp.Process):
                                   observation_space=observation_space,
                                   action_space=action_space)
         self.envs.seed(None if (seed is None) else seed + index * batch_size)
+        self.alg = alg
         self.batch_size = batch_size
         self.policy = policy
         self.baseline = baseline
@@ -310,7 +315,7 @@ class SamplerWorker(mp.Process):
 
         t0 = time.time()
         if validation_flag:
-            for item in self.maml_sample_trajectories(params=params):
+            for item in self.sample_trajectories(params=params):
                 episodes.append(*item)
 
         for item in self.sample_trajectories(params=params):
@@ -323,8 +328,13 @@ class SamplerWorker(mp.Process):
                                     normalize=True)
         return episodes
 
-    # >> Here we'll need to sample demos instead.
     def sample_trajectories(self, params=None):
+        if (self.alg == "mandril"):
+            return self.mandril_sample_trajectories(params=params)
+        else:
+            return self.maml_sample_trajectories(params=params)
+
+    def mandril_sample_trajectories(self, params=None):
         observations = self.envs.reset()
         with torch.no_grad():
             from mazelab.solvers import dijkstra_solver
