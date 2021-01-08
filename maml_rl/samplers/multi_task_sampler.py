@@ -284,7 +284,7 @@ class SamplerWorker(mp.Process):
                 # the examples with max-ent function instead
                 # here instead of loss, we should get dL/dr, and then update the
                 # params!
-                loss = reinforce_loss(self.policy, train_episodes, params=params)
+                loss = reinforce_loss(self.alg, self.policy, train_episodes, params=params)
                 # don't forget to check how the update works - and if it needs
                 # changing.
                 params = self.policy.update_params(loss,

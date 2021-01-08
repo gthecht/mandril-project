@@ -51,10 +51,12 @@ class MAMLTRPO(GradientBasedMetaLearner):
                  policy,
                  fast_lr=0.5,
                  first_order=False,
-                 device='cpu'):
+                 device='cpu',
+                 alg="maml"):
         super(MAMLTRPO, self).__init__(policy, device=device)
         self.fast_lr = fast_lr
         self.first_order = first_order
+        self.alg = alg
 
     async def adapt(self, train_futures, first_order=None):
         if first_order is None:
@@ -63,7 +65,8 @@ class MAMLTRPO(GradientBasedMetaLearner):
         params = None
         for futures in train_futures:
             # This is where we use the reinforce_loss
-            inner_loss = reinforce_loss(self.policy,
+            inner_loss = reinforce_loss(self.alg,
+                                        self.policy,
                                         await futures,
                                         params=params)
             params = self.policy.update_params(inner_loss,
