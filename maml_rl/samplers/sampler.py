@@ -20,6 +20,7 @@ class Sampler(object):
                  policy,
                  seed=None,
                  alg=None,
+                 expert=None,
                  env=None):
         self.env_name = env_name
         self.env_kwargs = env_kwargs
@@ -27,6 +28,7 @@ class Sampler(object):
         self.policy = policy
         self.seed = seed
         self.alg = alg
+        self.expert = expert
 
         if env is None:
             env = gym.make(env_name, **env_kwargs)

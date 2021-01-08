@@ -74,6 +74,7 @@ class MultiTaskSampler(Sampler):
                  env=None,
                  seed=None,
                  alg="maml",
+                 expert=None,
                  num_workers=1):
         super(MultiTaskSampler, self).__init__(env_name,
                                                env_kwargs,
@@ -100,6 +101,7 @@ class MultiTaskSampler(Sampler):
                                       deepcopy(baseline),
                                       self.seed,
                                       self.alg,
+                                      self.expert,
                                       self.task_queue,
                                       self.train_episodes_queue,
                                       self.valid_episodes_queue,
@@ -229,6 +231,7 @@ class SamplerWorker(mp.Process):
                  baseline,
                  seed,
                  alg,
+                 expert,
                  task_queue,
                  train_queue,
                  valid_queue,
@@ -242,6 +245,7 @@ class SamplerWorker(mp.Process):
                                   action_space=action_space)
         self.envs.seed(None if (seed is None) else seed + index * batch_size)
         self.alg = alg
+        self.expert = expert
         self.batch_size = batch_size
         self.policy = policy
         self.baseline = baseline
@@ -337,30 +341,14 @@ class SamplerWorker(mp.Process):
     def mandril_sample_trajectories(self, params=None):
         observations = self.envs.reset()
         with torch.no_grad():
-            from mazelab.solvers import dijkstra_solver
-            actions_list = []
-
-            for env in self.envs.envs:
-                impassable_array = env.unwrapped.maze.to_impassable()
-                motions = env.unwrapped.motions
-                start = env.unwrapped.maze.objects.agent.positions[0]
-                goal = env.unwrapped.maze.objects.goal.positions[0]
-                actions_list.append(dijkstra_solver(impassable_array, motions, start, goal))
-
-            max_length = max(map(len, actions_list))
-            actions_list = [actions + [None] * (max_length - len(actions)) \
-                            for actions in actions_list]
-            actions_mat = np.array(actions_list).T
-            
-            del actions_list
-            # observations = self.envs.reset()
             while not self.envs.dones.all():
-                actions = actions_mat[0,:]
-                actions = actions[actions != None]
-                actions_mat = actions_mat[1:,:] # remove current action from actions matrix
+                observations_tensor = torch.from_numpy(observations)
+                actions_tensor = self.expert(observations_tensor)
+                actions = actions_tensor.cpu().numpy()
+
                 new_observations, rewards, _, infos = self.envs.step(actions)
                 batch_ids = infos['batch_ids']
-                yield (observations, actions.astype(np.float32), rewards, batch_ids)
+                yield (observations, actions, rewards, batch_ids)
                 observations = new_observations
 
     def maml_sample_trajectories(self, params=None):
