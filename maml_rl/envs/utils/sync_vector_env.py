@@ -28,6 +28,11 @@ class SyncVectorEnv(SyncVectorEnv_):
         for env in self.envs:
             env.unwrapped.reset_task(task)
 
+    def means(self):
+        means = [env.unwrapped.means() for env in self.envs]
+        return means            
+        
+
     def step_wait(self):
         observations_list, infos = [], []
         batch_ids, j = [], 0

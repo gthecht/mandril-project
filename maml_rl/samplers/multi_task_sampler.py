@@ -82,6 +82,7 @@ class MultiTaskSampler(Sampler):
                                                policy,
                                                seed=seed,
                                                alg=alg,
+                                               expert=expert,
                                                env=env)
 
         self.num_workers = num_workers
@@ -343,7 +344,7 @@ class SamplerWorker(mp.Process):
         with torch.no_grad():
             while not self.envs.dones.all():
                 observations_tensor = torch.from_numpy(observations)
-                actions_tensor = self.expert(observations_tensor)
+                actions_tensor = self.expert(observations_tensor, self.envs)
                 actions = actions_tensor.cpu().numpy()
 
                 new_observations, rewards, _, infos = self.envs.step(actions)
