@@ -14,6 +14,7 @@ from maml_rl.samplers import MultiTaskSampler
 from maml_rl.utils.helpers import get_policy_for_env, get_input_size
 from maml_rl.utils.reinforcement_learning import get_returns
 
+from mab.mabExpert import MabExpert
 
 def test(
     config_path,
@@ -46,6 +47,9 @@ def test(
         policy.load_state_dict(state_dict)
     policy.share_memory()
 
+    # Expert
+    expert = MabExpert(env)
+
     # Baseline
     baseline = LinearFeatureBaseline(get_input_size(env))
 
@@ -58,6 +62,7 @@ def test(
                                env=env,
                                seed=seed,
                                alg=alg,
+                               expert=expert.get_actions,
                                num_workers=num_workers)
 
     logs = {'tasks': []}
@@ -92,7 +97,7 @@ if __name__ == '__main__':
     num_batches = 10
     num_workers = 8
     device = "cpu"
-    alg = "maml"
+    alg = "mandril"
     test(
         config_path,
         output_folder,
