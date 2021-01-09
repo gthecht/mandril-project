@@ -17,10 +17,10 @@ class MaxEnt:
                             lengths=episodes.lengths)
         return loss.mean()
 
-    def state_visitations_traj(self, demos, rewards):
-        vecs = torch.eye(4)
-        vecs = torch.cat((vecs, torch.zeros(1,4)), 0)
-        demos[rewards == 0] = 4
+    def state_visitations_traj(self, demos, rewards, action_shape):
+        vecs = torch.eye(action_shape)
+        vecs = torch.cat((vecs, torch.zeros(1,action_shape)), 0)
+        demos[rewards == 0] = action_shape
         # turn demos - which are tensors of actions, into tensors of vectors:
         visitations = torch.stack([vecs[int(action)].T for action in demos])
         visitations[rewards == 0] = 0
