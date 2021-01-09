@@ -16,6 +16,7 @@ from maml_rl.samplers import MultiTaskSampler
 from maml_rl.utils.helpers import get_policy_for_env, get_input_size
 from maml_rl.utils.reinforcement_learning import get_returns
 
+from mab.mabExpert import MabExpert
 
 def train(config_path, output_folder, seed=None, num_workers=1, device="cpu", alg="maml"):
     with open(config_path, 'r') as f:
@@ -52,6 +53,9 @@ def train(config_path, output_folder, seed=None, num_workers=1, device="cpu", al
     # Baseline
     baseline = LinearFeatureBaseline(get_input_size(env))
 
+    # Expert
+    expert = MabExpert(env)
+
     # Sampler
     sampler = MultiTaskSampler(config['env-name'],
                                env_kwargs=config.get('env-kwargs', {}),
@@ -61,6 +65,7 @@ def train(config_path, output_folder, seed=None, num_workers=1, device="cpu", al
                                env=env,
                                seed=seed,
                                alg=alg,
+                               expert=expert.get_actions,
                                num_workers=num_workers)
 
     metalearner = MAMLTRPO(policy,
@@ -106,5 +111,5 @@ if __name__ == '__main__':
     seed = 1
     num_workers = 8
     device = "cpu"
-    alg = "maml"
+    alg = "mandril"
     train(config, output_folder, seed, num_workers, device, alg)
