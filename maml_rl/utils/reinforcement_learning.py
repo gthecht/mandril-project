@@ -27,6 +27,9 @@ def value_iteration_finite_horizon(transitions, rewards, horizon=10, gamma=0.95)
 def get_returns(episodes):
     return to_numpy([episode.rewards.sum(dim=0) for episode in episodes])
 
+def get_actions(episodes):
+    return to_numpy([episode.actions for episode in episodes])
+
 # Here I can change the loss to use max-ent. Remember that I need dL/dr.
 def reinforce_loss(alg, policy, episodes, params=None):
     if (alg == "mandril"):

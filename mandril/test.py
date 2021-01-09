@@ -12,7 +12,7 @@ from tqdm import trange
 from maml_rl.baseline import LinearFeatureBaseline
 from maml_rl.samplers import MultiTaskSampler
 from maml_rl.utils.helpers import get_policy_for_env, get_input_size
-from maml_rl.utils.reinforcement_learning import get_returns
+from maml_rl.utils.reinforcement_learning import get_returns, get_actions
 
 from mab.mabExpert import MabExpert
 
@@ -66,7 +66,8 @@ def test(
                                num_workers=num_workers)
 
     logs = {'tasks': []}
-    train_returns, valid_returns = [], []
+    train_returns, train_actions = [], []
+    valid_returns, valid_actions = [], []
     for batch in trange(num_batches):
         tasks = sampler.sample_tasks(num_tasks=meta_batch_size)
         train_episodes, valid_episodes = sampler.sample(tasks,
@@ -78,10 +79,14 @@ def test(
 
         logs['tasks'].extend(tasks)
         train_returns.append(get_returns(train_episodes[0]))
+        train_actions.append(get_actions(train_episodes[0]))
         valid_returns.append(get_returns(valid_episodes))
+        valid_actions.append(get_actions(valid_episodes))
 
     logs['train_returns'] = np.concatenate(train_returns, axis=0)
+    logs['train_actions'] = np.concatenate(train_actions, axis=0)
     logs['valid_returns'] = np.concatenate(valid_returns, axis=0)
+    logs['valid_actions'] = np.concatenate(valid_actions, axis=0)
 
     with open(output_folder, 'wb') as f:
         np.savez(f, **logs)
