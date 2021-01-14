@@ -129,3 +129,44 @@ What I should do is instead of calling this function, create a function for Mand
 * Build a framework for which I have demos, and can test mandril.
 * Change how the loss is calculated (with max-ent of course)
 * Change how the test step is done.
+
+
+# What to study
+Now that Mandril is working (I think), I can start creating various experts and problems to test the whole thing on.
+The main direction is:
+> ***How does mandril behave when the expert is suboptimal. How would it work with varying experts?***
+
+I'll start with changing suboptimal experts.
+But first, we need to discuss which problem exactly we will look at.
+### Questions:
+1. What is the goal of the agent:
+    * To maximize the rewards.
+    * To minimize the regret (Compared with the known best arm).
+    * To find the optimal arm of the bandit.
+
+2. What does the expert know?
+    * What values the arms have?
+    * A well developed algorithm for achieving the desired goal (i.e. minimizing regret .etc).
+
+For the first question, I think the best possibility is minimizing regret, or maybe choosing the best arm.
+Currently my expert knows the arms' weights prior to the run.
+## Sub-optimal experts in MAB
+I currently have the perfect expert - who knows what values the arms have, and always chooses the best arm - the same one.
+I have seen that this is easily learned by mandril, and is of course far from maml.
+
+I can create experts that choose the arms with some probability, say 70% of the time it chooses the best arm, and 30% randomly or something like that.
+Changing the probability of going random can easily create worse and worse arms, but still hold information on which is probably the best arm.
+Since the Mandril sees if the expert got a reward or not, he can still in theory extrapolate which arm is best.
+
+In this case, I think the best option is to demand of the Mandril agent to pick what arm he thinks is best.
+Or we can also test him a few times, and see if he makes some temporal algorithm.
+A different kind of expert could be one that chooses randomly between the **k** best arms. Then we'll test if the algorithm decided which arm is best or not.
+
+### Changes to the expert
+Make multiple experts possible. They should be divided into types, and then with values.
+
+I may want to have various types of experts, or changing values. So I need to design a way to log this during test and training.
+
+### Changes to the run
+I think that having the agent pick an arm but once isn't right. I guess the environment should give him his reward as a state, to make the problem more dynamic.
+This I will probably do later on.
