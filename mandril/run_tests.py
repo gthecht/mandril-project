@@ -1,7 +1,6 @@
 from test import test
 
 def test_mandril(model_folder, expert_type, expert_args):
-    config_path = "configs/maml/bandit/bandit-k5-n10.yaml"
     seed = 1
     num_workers = 8
     meta_batch_size = 20
@@ -10,12 +9,13 @@ def test_mandril(model_folder, expert_type, expert_args):
     device = "cpu"
     alg = "mandril"
 
-    output_folder = model_folder + "config.json"
-    policy_path = model_folder + "policy.json"
+    config_path = model_folder + "/config.json"
+    policy_path = model_folder + "/policy.th"
+    output_path = model_folder + "/results.npz"
 
     test(
         config_path,
-        output_folder,
+        output_path,
         policy_path,
         seed=seed,
         num_workers=num_workers,

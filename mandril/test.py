@@ -25,7 +25,9 @@ def test(
     num_batches=10,
     meta_batch_size=10,
     device="cpu",
-    alg="maml"
+    alg="maml",
+    expert_type="perfect",
+    expert_args={}
 ):
     with open(config_path, 'r') as f:
         config = json.load(f)
@@ -48,7 +50,7 @@ def test(
     policy.share_memory()
 
     # Expert
-    expert = MabExpert(env)
+    expert = MabExpert(env, expert_type, expert_args)
 
     # Baseline
     baseline = LinearFeatureBaseline(get_input_size(env))
