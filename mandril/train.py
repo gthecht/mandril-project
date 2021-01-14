@@ -18,7 +18,16 @@ from maml_rl.utils.reinforcement_learning import get_returns
 
 from mab.mabExpert import MabExpert
 
-def train(config_path, output_folder, seed=None, num_workers=1, device="cpu", alg="maml"):
+def train(
+    config_path,
+    output_folder,
+    seed=None,
+    num_workers=1,
+    device="cpu",
+    alg="maml",
+    expert_type="perfect",
+    expert_args={}
+):
     with open(config_path, 'r') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
@@ -54,7 +63,7 @@ def train(config_path, output_folder, seed=None, num_workers=1, device="cpu", al
     baseline = LinearFeatureBaseline(get_input_size(env))
 
     # Expert
-    expert = MabExpert(env)
+    expert = MabExpert(env, expert_type, expert_args)
 
     # Sampler
     sampler = MultiTaskSampler(config['env-name'],
