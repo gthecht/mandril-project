@@ -21,4 +21,4 @@ class MabExpert:
         arms, sorted_arm_inds = self._means.sort(descending=True)
         N = arms.shape[0]
         rand_ind = torch.randint(0, self.values["k"], (N,1))
-        return sorted_arm_inds[rand_ind,:]
+        return sorted_arm_inds[torch.arange(0,N)[:,None],rand_ind].squeeze()
