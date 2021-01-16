@@ -8,6 +8,7 @@ class MabExpert:
         self.experts = {
             "perfect": self.perfect,
             "rand_from_k_best": self.rand_from_k_best,
+            "random_rand_from_k": self.random_rand_from_k,
         }
 
     def get_actions(self, observations_tensor, envs_vec):
@@ -22,3 +23,7 @@ class MabExpert:
         N = arms.shape[0]
         rand_ind = torch.randint(0, self.values["k"], (N,1))
         return sorted_arm_inds[torch.arange(0,N)[:,None],rand_ind].squeeze()
+
+    def random_rand_from_k(self):
+        self.values["k"] = torch.randint(0,values["max_k"])
+        return self.rand_from_k_best()
