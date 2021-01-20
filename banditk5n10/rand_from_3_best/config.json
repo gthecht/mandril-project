@@ -12,7 +12,7 @@
   "num-steps": 1,
   "fast-lr": 0.5,
   "num-batches": 5000,
-  "meta-batch-size": 50,
+  "meta-batch-size": 20,
   "max-kl": 0.01,
   "cg-iters": 10,
   "cg-damping": 1e-05,
