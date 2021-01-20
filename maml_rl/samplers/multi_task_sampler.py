@@ -320,7 +320,7 @@ class SamplerWorker(mp.Process):
 
         t0 = time.time()
         if validation_flag:
-            for item in self.sample_trajectories(params=params):
+            for item in self.maml_sample_trajectories(params=params):
                 episodes.append(*item)
 
         for item in self.sample_trajectories(params=params):
