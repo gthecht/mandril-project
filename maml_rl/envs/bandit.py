@@ -35,8 +35,9 @@ class BernoulliBanditEnv(gym.Env):
         return [seed]
 
     def sample_tasks(self, num_tasks):
-        means = self.np_random.rand(num_tasks, self.k)
-        tasks = [{'mean': mean} for mean in means]
+        # means = self.np_random.rand(num_tasks, self.k)
+        mean_options = np.linspace(0.05, 0.95, self.k)
+        tasks = [{'mean': self.np_random.permutation(mean_options)} for counter in range(num_tasks)]
         return tasks
 
     def reset_task(self, task):
