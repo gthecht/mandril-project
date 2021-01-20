@@ -19,7 +19,7 @@
   "ls-max-steps": 15,
   "ls-backtrack-ratio": 0.8,
   "config": "configs/maml/bandit/bandit-k5-n10.yaml",
-  "output_folder": "banditk5n10/perfect",
+  "output_folder": "banditk5n10/rand_from_rand_best_4",
   "seed": 1,
   "num_workers": 8,
   "use_cuda": false,
