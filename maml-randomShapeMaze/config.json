@@ -1,22 +1,21 @@
 {
   "env-name": "RandomShapeMaze-v0",
   "env-kwargs": {
-    "width": 20,
-    "height": 20,
-    "max_shapes": 20,
-    "max_size": 4,
+    "width": 10,
+    "height": 10,
+    "max_shapes": 5,
+    "max_size": 2,
     "allow_overlap": false,
     "shape": null
   },
   "gamma": 0.99,
   "gae-lambda": 1.0,
-  "first-order": false,
+  "first-order": true,
   "hidden-sizes": [
-    16,
-    32
+    16
   ],
   "nonlinearity": "relu",
-  "fast-batch-size": 10,
+  "fast-batch-size": 20,
   "num-steps": 1,
   "fast-lr": 0.1,
   "num-batches": 5000,

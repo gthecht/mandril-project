@@ -5,10 +5,10 @@ env-name: "RandomShapeMaze-v0"
 
 # Additional parameters for the environment (eg. bound for task sampling).
 env-kwargs:
-  width: 20
-  height: 20
-  max_shapes: 20
-  max_size: 4
+  width: 10
+  height: 10
+  max_shapes: 5
+  max_size: 2
   allow_overlap: false
   shape: null
 
@@ -19,12 +19,12 @@ gamma: 0.99
 gae-lambda: 1.0
 
 # If "true", then the first order approximation of MAML is applied.
-first-order: false
+first-order: true
 
 # Policy network
 # --------------
 # Number of hidden units in each layer.
-hidden-sizes: [32, 32]
+hidden-sizes: [16]
 
 # Non-linear activation function to apply after each hidden layer.
 nonlinearity: "relu"
