@@ -19,7 +19,7 @@
   "fast-batch-size": 20,
   "num-steps": 1,
   "fast-lr": 0.1,
-  "num-batches": 500,
+  "num-batches": 5000,
   "meta-batch-size": 20,
   "max-kl": 0.01,
   "cg-iters": 10,
