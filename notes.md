@@ -123,9 +123,34 @@ def reinforce_loss(policy, episodes, params=None):
 * **log_probs** looks like the log of the probabilities - which is exactly what we need.
 What I should do is instead of calling this function, create a function for Mandril, that returns $\frac{\partial L_{T_i}}{\partial r_\theta}$
 
-## TO DO
-* I need to implement the max-ent: *Use $\frac{\partial L} {\partial r_\theta}=E_T [\mu_T]-\mu_D$ like in the max-ent function.* These are the state visitations trajecotries, and I can get them from Ziebart.
-* Where to change the validation point for the meta testing.
+# Frameworks:
+## MAB
+I did a simple MAB problem, where the arm - reward means are known by the expert but not by the agent.
+From what I saw, the agent simply copies the expert, but doesn't do any better if the expert is sub-optimal.
+
+## Random-shape maze
+I have been trying to train the agent on a maze - where each meta-task is based on a separate maze configuration, and within it the examples come with changing start and goal points.
+
+This doesn't work very well, I'm not sure if this is because I'm not training enough or if there is a problem in the way I'm testing and training...
+
+## Varying weight maze
+One option for a maze is with an open space - each block is possible (except perhaps for the edges), but each square has a value of the cost of that square (for instance the time).
+
+This can be solved optimally with Dijkstra (since all costs are positive), and therefore I can easily create experts and sub-optimal experts.
+
+### Thoughts
+I can either make varying goals, or start with a constant goal and start position, to test the training.
+
+The idea here is that the reward function the agent needs to build is something like the inverse of the local costs. It should also describe the locality of the square, since if the neighbors have a great cost, there is no point in going that way.
+
+##### idea
+I could start with the same goal all the time, and compare between mandril and maxent.
+After that I could make varying goals and compare again between the two.
+
+# TO DO
+* ~~I need to implement the max-ent: *Use $\frac{\partial L} {\partial r_\theta}=E_T [\mu_T]-\mu_D$ like in the max-ent function.~~
+* ~~These are the state visitations trajectories, and I can get them from Ziebart.~~
+* ~~Where to change the validation point for the meta testing.~~
 * Build a framework for which I have demos, and can test mandril.
-* Change how the loss is calculated (with max-ent of course)
-* Change how the test step is done.
+* ~~Change how the loss is calculated (with max-ent of course)~~
+* ~~Change how the test step is done.~~
