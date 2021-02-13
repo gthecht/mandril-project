@@ -148,9 +148,9 @@ I could start with the same goal all the time, and compare between mandril and m
 After that I could make varying goals and compare again between the two.
 
 # TO DO
-* ~~I need to implement the max-ent: *Use $\frac{\partial L} {\partial r_\theta}=E_T [\mu_T]-\mu_D$ like in the max-ent function.~~
-* ~~These are the state visitations trajectories, and I can get them from Ziebart.~~
-* ~~Where to change the validation point for the meta testing.~~
-* Build a framework for which I have demos, and can test mandril.
-* ~~Change how the loss is calculated (with max-ent of course)~~
-* ~~Change how the test step is done.~~
+* Make gridworld a gym environment
+* Make gridworld a meta-learning problem
+* Use the maxEnt defined in irl-maxent
+* Change the policy parameters to theta for training
+* Run with sub-experts
+* Compare mandril to regular maxent-irl
