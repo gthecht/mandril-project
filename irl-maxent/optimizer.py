@@ -396,3 +396,36 @@ class Constant(Initializer):
             return np.ones(shape) * self.value(shape)
         else:
             return np.ones(shape) * self.value
+
+class Inherited(Initializer):
+    """
+    An Initializer, initializing parameters to a constant value.
+
+    Args:
+        value: Either a scalar value or a function in dependence on the
+            shape of the parameters, returning a scalar value for
+            initialization.
+    """
+    def __init__(self, parameters=None):
+        super().__init__()
+        self.theta = parameters
+        if parameters is None:
+            self.value = 1.0
+
+    def initialize(self, shape):
+        """
+        Create set of parameters with initial fixed value.
+
+        The scalar value used for initialization can be specified in the
+        constructor.
+
+        Args:
+            shape: The shape of the parameters.
+
+        Returns:
+            An set of constant-valued parameters of the given shape.
+        """
+        if self.theta is not None:
+            return self.theta
+        else:
+            return np.ones(shape) * self.value
