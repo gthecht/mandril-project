@@ -81,7 +81,7 @@ class gridWorldEnv(gym.Env):
 
         return tjs, policy
 
-    def maxent(self, task, trajectories):
+    def maxent(self, task, trajectories, parameters=None):
         """
         Maximum Entropy Inverse Reinforcement Learning
         """
@@ -90,7 +90,7 @@ class gridWorldEnv(gym.Env):
 
         # choose our parameter initialization strategy:
         #   initialize parameters with constant
-        init = O.Constant(1.0)
+        init = O.Inherited(parameters)
 
         # choose our optimization strategy:
         #   we select exponentiated gradient descent with linear learning-rate decay
@@ -112,7 +112,7 @@ class gridWorldEnv(gym.Env):
         # choose our parameter initialization strategy:
         #   initialize parameters with constant
         
-        init = O.Constant(1.0)
+        init = O.Inherited(parameters)
 
         # choose our optimization strategy:
         #   we select exponentiated gradient descent with linear learning-rate decay
