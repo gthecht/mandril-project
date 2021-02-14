@@ -54,9 +54,25 @@ class gridWorldEnv(gym.Env):
         self.start[task["terminal"]] = 0
         self._task["start"] = self.start
 
+    def reset_task_single(self, task):
+        self._task = task
+        # set up initial probabilities for trajectory generation
+        start_probs = (1 / (task["world"].n_states - 1)) * np.ones(task["world"].n_states)
+        # The start cannot be the goal
+        start_probs[task["terminal"]] = 0
+        # In order that we have the same start allways
+        chosen = np.random.choice(
+            task["world"].n_states,
+            p=self.start
+        )
+        self.start = np.zeros(task["world"].n_states)
+        self.start[chosen] = 1
+        self._task["start"] = self.start
+
     # reset the specific task - with the same start and finish
     def reset(self):
-        return self.start
+        # note that the start here is random and not identical to the prev
+        return self._task
 
     # def step(self, action):
     #     assert self.action_space.contains(action)
@@ -66,13 +82,13 @@ class gridWorldEnv(gym.Env):
 
     #     return observation, reward, True, {'task': self._task}
 
-    def generate_trajectories(self, task, n_trajectories):
+    def generate_trajectories(self, task=None, n_trajectories=1):
         """
         Generate some "expert" trajectories.
         task:
         {world, reward, terminal, start, discount, weighting}
         """
-
+        if task is None: task = self._task
         # generate trajectories
         value = S.value_iteration(task["world"].p_transition, task["reward"], task["discount"])
         policy = S.stochastic_policy_from_value(task["world"], value, w=task["weighting"])
